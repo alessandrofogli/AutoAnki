@@ -17,11 +17,14 @@ python = ">=3.10,<3.14"
 fastapi = "*"
 uvicorn = "*"
 langchain = "*"
-langgraph = "*"
+langgraph = "^0.5.1"
 ollama = "*"
 streamlit = "*"
 httpx = "*"
 pydantic = "*"
+langchain-community = "^0.3.27"
+langchain-ollama = "^0.3.3"
+graphviz = "^0.21"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
