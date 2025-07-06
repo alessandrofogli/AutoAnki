@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "autoanki"
+version = "0.1.0"
+description = "LLM-powered webapp to interact with Anki via MCP, LangGraph, LangChain, FastAPI, Streamlit, and Ollama."
+authors = ["Your Name <your.email@example.com>"]
+
+# Specify the source code packages for Poetry
+packages = [
+    { include = "backend" },
+    { include = "frontend" },
+    { include = "agents" },
+    { include = "anki_integration" }
+]
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.14"
+fastapi = "*"
+uvicorn = "*"
+langchain = "*"
+langgraph = "*"
+ollama = "*"
+streamlit = "*"
+httpx = "*"
+pydantic = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
