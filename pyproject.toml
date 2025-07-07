@@ -25,6 +25,7 @@ pydantic = "*"
 langchain-community = "^0.3.27"
 langchain-ollama = "^0.3.3"
 graphviz = "^0.21"
+ipython = "<9"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
