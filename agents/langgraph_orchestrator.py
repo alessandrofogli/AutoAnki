@@ -10,6 +10,7 @@ from langchain_ollama import OllamaLLM
 from .supervisor_agent import create_supervisor_agent
 from .topic_research_agent import create_topic_research_agent
 from .card_generator_agent import create_card_generator_agent
+from config import MODEL_NAME
 
 
 class AgentState(TypedDict):
@@ -25,13 +26,15 @@ class AgentState(TypedDict):
 class LangGraphOrchestrator:
     """Orchestrates the flashcard generation workflow using LangGraph."""
     
-    def __init__(self, model_name: str = "deepseek-r1:8b"):
+    def __init__(self, model_name: str = None):
         """
-        Initialize the orchestrator with a specific deepseek-r1:8b model.
+        Initialize the orchestrator with a specific model.
         
         Args:
-            model_name: Name of the Ollama model to use (default: deepseek-r1:8b)
+            model_name: Name of the Ollama model to use
         """
+        if model_name is None:
+            model_name = MODEL_NAME
         self.llm = OllamaLLM(model=model_name)
         self.graph = self._build_graph()
         
@@ -80,6 +83,6 @@ class LangGraphOrchestrator:
         return result
 
 
-def create_orchestrator(model_name: str = "deepseek-r1:8b") -> LangGraphOrchestrator:
+def create_orchestrator(model_name: str = None) -> LangGraphOrchestrator:
     """Factory function to create a LangGraph orchestrator."""
     return LangGraphOrchestrator(model_name)

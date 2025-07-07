@@ -9,6 +9,7 @@ import sys
 import os
 import time
 import requests
+from config import MODEL_NAME
 
 
 def check_ollama():
@@ -20,7 +21,7 @@ def check_ollama():
         return False
 
 
-def check_model(model_name="deepseek-r1:8b"):
+def check_model(model_name=MODEL_NAME):
     """Check if the specified model is available."""
     try:
         response = requests.get("http://localhost:11434/api/tags", timeout=5)
@@ -46,20 +47,20 @@ def main():
         sys.exit(1)
     print("✅ Ollama is running")
     
-    # Check if deepseek-r1:8b model is available
-    print("🔍 Checking for deepseek-r1:8b model...")
-    if not check_model("deepseek-r1:8b"):
-        print("⚠️  deepseek-r1:8b model not found!")
-        print("Pulling deepseek-r1:8b model...")
+    # Check if the configured model is available
+    print(f"🔍 Checking for {MODEL_NAME} model...")
+    if not check_model():
+        print(f"⚠️  {MODEL_NAME} model not found!")
+        print(f"Pulling {MODEL_NAME} model...")
         try:
-            subprocess.run(["ollama", "pull", "deepseek-r1:8b"], check=True)
-            print("✅ deepseek-r1:8b model downloaded successfully")
+            subprocess.run(["ollama", "pull", MODEL_NAME], check=True)
+            print(f"✅ {MODEL_NAME} model downloaded successfully")
         except subprocess.CalledProcessError:
-            print("❌ Failed to download deepseek-r1:8b model")
-            print("You can try manually: ollama pull deepseek-r1:8b")
+            print(f"❌ Failed to download {MODEL_NAME} model")
+            print(f"You can try manually: ollama pull {MODEL_NAME}")
             sys.exit(1)
     else:
-        print("✅ deepseek-r1:8b model is available")
+        print(f"✅ {MODEL_NAME} model is available")
     
     print()
     print("🎯 Starting FastAPI server...")

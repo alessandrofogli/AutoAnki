@@ -7,6 +7,7 @@ This script tests the agent workflow directly without the FastAPI server.
 import sys
 import os
 import json
+from config import MODEL_NAME
 
 # Add the current directory to the path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -28,7 +29,7 @@ def test_flashcard_generation():
     try:
         # Create orchestrator
         print("🔧 Initializing orchestrator...")
-        orchestrator = create_orchestrator("deepseek-r1:8b")
+        orchestrator = create_orchestrator(MODEL_NAME)
         print("✅ Orchestrator initialized successfully")
         print()
         
@@ -70,7 +71,7 @@ def test_flashcard_generation():
         print(f"❌ Error: {e}")
         print("\n🔧 Troubleshooting:")
         print("1. Make sure Ollama is running: ollama serve")
-        print("2. Make sure the model is available: ollama pull deepseek-r1:8b")
+        print(F"2. Make sure the model is available: ollama pull {MODEL_NAME}")
         print("3. Check that all dependencies are installed: poetry install")
         return False
 

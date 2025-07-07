@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from typing import List, Dict, Any
 import sys
 import os
+from config import MODEL_NAME
 
 # Add the parent directory to the path so we can import from agents
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -25,7 +26,7 @@ orchestrator = None
 
 class FlashcardRequest(BaseModel):
     instruction: str
-    model_name: str = "deepseek-r1:8b"
+    model_name: str = MODEL_NAME
 
 class FlashcardResponse(BaseModel):
     instruction: str
@@ -39,7 +40,7 @@ async def startup_event():
     """Initialize the orchestrator on startup."""
     global orchestrator
     try:
-        orchestrator = create_orchestrator("deepseek-r1:8b")
+        orchestrator = create_orchestrator(MODEL_NAME)
         print("✅ AutoAnki orchestrator initialized successfully")
     except Exception as e:
         print(f"❌ Failed to initialize orchestrator: {e}")
@@ -102,8 +103,8 @@ async def generate_flashcards(request: FlashcardRequest):
 def list_available_models():
     """List available Ollama models (placeholder for future implementation)."""
     return {
-        "available_models": ["deepseek-r1:8b", "mistral", "llama2"],
-        "current_model": "deepseek-r1:8b",
+        "available_models": [MODEL_NAME, "mistral", "llama2"],
+        "current_model": MODEL_NAME,
         "note": "This endpoint will be enhanced to actually check available models"
     }
 
