@@ -3,6 +3,9 @@ from langchain_core.runnables import RunnableLambda
 from langchain_community.llms import Ollama
 from langchain_core.prompts import PromptTemplate
 import json
+from config import get_logger
+
+logger = get_logger(__name__)
 
 
 class CardGeneratorAgent:
@@ -48,9 +51,11 @@ Flashcards (JSON format only):
             Dictionary containing the flashcards and metadata
         """
         mini_lesson = state["mini_lesson"]
+        logger.info("🃏 Card Generator Agent: Starting flashcard generation")
         
         # Generate flashcards using the LLM
         prompt = self.prompt.format(mini_lesson=mini_lesson)
+        logger.debug("🔧 Card Generator Agent: Generated prompt, invoking LLM...")
         response = self.llm.invoke(prompt)
         
         # Parse the JSON response
@@ -61,6 +66,7 @@ Flashcards (JSON format only):
             json_str = response[json_start:json_end]
             
             flashcards = json.loads(json_str)
+            logger.debug(f"📋 Card Generator Agent: Successfully parsed {len(flashcards)} raw flashcards from LLM")
             
             # Validate flashcard structure
             validated_flashcards = []
@@ -72,7 +78,10 @@ Flashcards (JSON format only):
                         "category": card.get("category", "general")
                     })
             
+            logger.info(f"✅ Card Generator Agent: Successfully validated {len(validated_flashcards)} flashcards")
+            
         except (json.JSONDecodeError, KeyError, TypeError) as e:
+            logger.warning(f"⚠️ Card Generator Agent: JSON parsing failed, using fallback: {e}")
             # Fallback: create simple flashcards if JSON parsing fails
             validated_flashcards = [
                 {
@@ -82,12 +91,15 @@ Flashcards (JSON format only):
                 }
             ]
         
-        return {
+        result = {
             **state,
             "flashcards": validated_flashcards,
             "status": "card_generation_complete",
             "agent": "card_generator"
         }
+        
+        logger.info("🏁 Card Generator Agent: Flashcard generation workflow completed")
+        return result
 
 
 def create_card_generator_agent(llm: Ollama) -> RunnableLambda:

@@ -9,7 +9,10 @@ import sys
 import os
 import time
 import requests
-from config import MODEL_NAME
+from config import MODEL_NAME, get_logger
+
+# Set up logging for this module
+logger = get_logger(__name__)
 
 
 def check_ollama():
@@ -35,39 +38,39 @@ def check_model(model_name=MODEL_NAME):
 
 def main():
     """Main startup function."""
-    print("🚀 AutoAnki Server Startup")
-    print("=" * 40)
+    logger.info("🚀 AutoAnki Server Startup")
+    logger.info("=" * 40)
     
     # Check if Ollama is running
-    print("🔍 Checking Ollama...")
+    logger.info("🔍 Checking Ollama...")
     if not check_ollama():
-        print("❌ Ollama is not running!")
-        print("Please start Ollama with: ollama serve")
-        print("Then run this script again.")
+        logger.error("❌ Ollama is not running!")
+        logger.error("Please start Ollama with: ollama serve")
+        logger.error("Then run this script again.")
         sys.exit(1)
-    print("✅ Ollama is running")
+    logger.info("✅ Ollama is running")
     
     # Check if the configured model is available
-    print(f"🔍 Checking for {MODEL_NAME} model...")
+    logger.info(f"🔍 Checking for {MODEL_NAME} model...")
     if not check_model():
-        print(f"⚠️  {MODEL_NAME} model not found!")
-        print(f"Pulling {MODEL_NAME} model...")
+        logger.warning(f"⚠️  {MODEL_NAME} model not found!")
+        logger.info(f"Pulling {MODEL_NAME} model...")
         try:
             subprocess.run(["ollama", "pull", MODEL_NAME], check=True)
-            print(f"✅ {MODEL_NAME} model downloaded successfully")
+            logger.info(f"✅ {MODEL_NAME} model downloaded successfully")
         except subprocess.CalledProcessError:
-            print(f"❌ Failed to download {MODEL_NAME} model")
-            print(f"You can try manually: ollama pull {MODEL_NAME}")
+            logger.error(f"❌ Failed to download {MODEL_NAME} model")
+            logger.error(f"You can try manually: ollama pull {MODEL_NAME}")
             sys.exit(1)
     else:
-        print(f"✅ {MODEL_NAME} model is available")
+        logger.info(f"✅ {MODEL_NAME} model is available")
     
-    print()
-    print("🎯 Starting FastAPI server...")
-    print("📖 API documentation will be available at: http://localhost:8000/docs")
-    print("🔍 Health check: http://localhost:8000/health")
-    print("⏹️  Press Ctrl+C to stop the server")
-    print()
+    logger.info("")
+    logger.info("🎯 Starting FastAPI server...")
+    logger.info("📖 API documentation will be available at: http://localhost:8000/docs")
+    logger.info("🔍 Health check: http://localhost:8000/health")
+    logger.info("⏹️  Press Ctrl+C to stop the server")
+    logger.info("")
     
     # Start the FastAPI server
     try:
@@ -79,9 +82,9 @@ def main():
             "--reload"
         ])
     except KeyboardInterrupt:
-        print("\n👋 Server stopped by user")
+        logger.info("\n👋 Server stopped by user")
     except Exception as e:
-        print(f"❌ Failed to start server: {e}")
+        logger.error(f"❌ Failed to start server: {e}")
         sys.exit(1)
 
 

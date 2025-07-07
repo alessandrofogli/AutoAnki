@@ -4,7 +4,10 @@ from pydantic import BaseModel
 from typing import List, Dict, Any
 import sys
 import os
-from config import MODEL_NAME
+from config import MODEL_NAME, get_logger
+
+# Set up logging for this module
+logger = get_logger(__name__)
 
 # Add the parent directory to the path so we can import from agents
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -41,10 +44,10 @@ async def startup_event():
     global orchestrator
     try:
         orchestrator = create_orchestrator(MODEL_NAME)
-        print("✅ AutoAnki orchestrator initialized successfully")
+        logger.info("✅ AutoAnki orchestrator initialized successfully")
     except Exception as e:
-        print(f"❌ Failed to initialize orchestrator: {e}")
-        print("Make sure Ollama is running and the model is available")
+        logger.error(f"❌ Failed to initialize orchestrator: {e}")
+        logger.error("Make sure Ollama is running and the model is available")
 
 @app.get("/")
 def read_root():

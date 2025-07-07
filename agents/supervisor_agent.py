@@ -1,6 +1,9 @@
 from typing import Dict, Any
 from langchain_core.runnables import RunnableLambda
 from langchain_ollama import OllamaLLM
+from config import get_logger
+
+logger = get_logger(__name__)
 
 
 class SupervisorAgent:
@@ -19,12 +22,17 @@ class SupervisorAgent:
         Returns:
             Dictionary containing the instruction and metadata
         """
-        return {
+        logger.info(f"🎯 Supervisor Agent: Processing instruction - '{instruction}'")
+        
+        result = {
             "instruction": instruction,
             "status": "supervisor_complete",
             "timestamp": "2024-01-01T00:00:00Z",  # In production, use actual timestamp
             "agent": "supervisor"
         }
+        
+        logger.info("✅ Supervisor Agent: Completed processing, handing off to topic research")
+        return result
 
 
 def create_supervisor_agent(llm: OllamaLLM) -> RunnableLambda:

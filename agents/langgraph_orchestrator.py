@@ -10,7 +10,9 @@ from langchain_ollama import OllamaLLM
 from .supervisor_agent import create_supervisor_agent
 from .topic_research_agent import create_topic_research_agent
 from .card_generator_agent import create_card_generator_agent
-from config import MODEL_NAME
+from config import MODEL_NAME, get_logger
+
+logger = get_logger(__name__)
 
 
 class AgentState(TypedDict):
@@ -67,6 +69,8 @@ class LangGraphOrchestrator:
         Returns:
             Dictionary containing the complete workflow result with flashcards
         """
+        logger.info(f"🚀 Orchestrator: Starting flashcard generation workflow for: '{instruction}'")
+        
         # Initialize the state
         initial_state = {
             "instruction": instruction,
@@ -77,8 +81,12 @@ class LangGraphOrchestrator:
             "timestamp": "2024-01-01T00:00:00Z"
         }
         
+        logger.info("🔄 Orchestrator: Executing LangGraph workflow...")
+        
         # Run the workflow
         result = self.graph.invoke(initial_state)
+        
+        logger.info(f"🎉 Orchestrator: Workflow completed successfully! Generated {len(result.get('flashcards', []))} flashcards")
         
         return result
 
