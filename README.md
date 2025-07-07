@@ -114,6 +114,10 @@ AutoAnki/
 └── pyproject.toml              # Dependencies
 ```
 
+## Workflow Graph
+
+![Workflow Graph](graph_structure.png)
+
 ### Adding New Models
 
 To use a different Ollama model:
