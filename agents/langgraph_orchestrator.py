@@ -6,11 +6,10 @@ This module will contain LangGraph orchestration logic for AutoAnki agents.
 
 from typing import Dict, Any, TypedDict
 from langgraph.graph import StateGraph, END
-from langchain_ollama import OllamaLLM
 from .supervisor_agent import create_supervisor_agent
 from .topic_research_agent import create_topic_research_agent
 from .card_generator_agent import create_card_generator_agent
-from config import MODEL_NAME, get_logger
+from config import MODEL_NAME, get_logger, create_llm_instance, MODEL_PROVIDER
 
 logger = get_logger(__name__)
 
@@ -28,16 +27,22 @@ class AgentState(TypedDict):
 class LangGraphOrchestrator:
     """Orchestrates the flashcard generation workflow using LangGraph."""
     
-    def __init__(self, model_name: str = None):
+    def __init__(self, model_name: str = None, llm_instance = None):
         """
         Initialize the orchestrator with a specific model.
         
         Args:
-            model_name: Name of the Ollama model to use
+            model_name: Name of the model to use (for backward compatibility)
+            llm_instance: Pre-configured LLM instance (takes precedence)
         """
-        if model_name is None:
-            model_name = MODEL_NAME
-        self.llm = OllamaLLM(model=model_name)
+        if llm_instance is not None:
+            self.llm = llm_instance
+            logger.info(f"🔧 Orchestrator: Using provided LLM instance ({type(llm_instance).__name__})")
+        else:
+            # Use the configured provider
+            self.llm = create_llm_instance()
+            logger.info(f"🔧 Orchestrator: Created LLM instance using {MODEL_PROVIDER.upper()} provider")
+        
         self.graph = self._build_graph()
         
     def _build_graph(self) -> StateGraph:
@@ -91,6 +96,15 @@ class LangGraphOrchestrator:
         return result
 
 
-def create_orchestrator(model_name: str = None) -> LangGraphOrchestrator:
-    """Factory function to create a LangGraph orchestrator."""
-    return LangGraphOrchestrator(model_name)
+def create_orchestrator(model_name: str = None, llm_instance = None) -> LangGraphOrchestrator:
+    """
+    Factory function to create a LangGraph orchestrator.
+    
+    Args:
+        model_name: Name of the model (for backward compatibility)
+        llm_instance: Pre-configured LLM instance (takes precedence)
+        
+    Returns:
+        Configured LangGraph orchestrator
+    """
+    return LangGraphOrchestrator(model_name=model_name, llm_instance=llm_instance)

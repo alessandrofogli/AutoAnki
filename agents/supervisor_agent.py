@@ -1,6 +1,6 @@
 from typing import Dict, Any
 from langchain_core.runnables import RunnableLambda
-from langchain_ollama import OllamaLLM
+from langchain_core.language_models.llms import LLM
 from config import get_logger
 
 logger = get_logger(__name__)
@@ -9,7 +9,7 @@ logger = get_logger(__name__)
 class SupervisorAgent:
     """Supervisor agent that coordinates the flashcard generation workflow."""
     
-    def __init__(self, llm: OllamaLLM):
+    def __init__(self, llm: LLM):
         self.llm = llm
         
     def run(self, instruction: str) -> Dict[str, Any]:
@@ -35,7 +35,7 @@ class SupervisorAgent:
         return result
 
 
-def create_supervisor_agent(llm: OllamaLLM) -> RunnableLambda:
+def create_supervisor_agent(llm: LLM) -> RunnableLambda:
     """Factory function to create a runnable supervisor agent."""
     agent = SupervisorAgent(llm)
     return RunnableLambda(agent.run) 

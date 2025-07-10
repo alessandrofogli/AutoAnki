@@ -1,6 +1,6 @@
 from typing import Dict, Any, List
 from langchain_core.runnables import RunnableLambda
-from langchain_community.llms import Ollama
+from langchain_core.language_models.llms import LLM
 from langchain_core.prompts import PromptTemplate
 import json
 from config import get_logger
@@ -11,7 +11,7 @@ logger = get_logger(__name__)
 class CardGeneratorAgent:
     """Agent that generates flashcards from a mini lesson."""
     
-    def __init__(self, llm: Ollama):
+    def __init__(self, llm: LLM):
         self.llm = llm
         self.prompt = PromptTemplate(
             input_variables=["mini_lesson"],
@@ -102,7 +102,7 @@ Flashcards (JSON format only):
         return result
 
 
-def create_card_generator_agent(llm: Ollama) -> RunnableLambda:
+def create_card_generator_agent(llm: LLM) -> RunnableLambda:
     """Factory function to create a runnable card generator agent."""
     agent = CardGeneratorAgent(llm)
     return RunnableLambda(agent.run) 

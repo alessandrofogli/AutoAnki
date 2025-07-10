@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from typing import List, Dict, Any
 import sys
 import os
-from config import MODEL_NAME, get_logger
+from config import MODEL_NAME, get_logger, MODEL_PROVIDER, get_model_config
 
 # Set up logging for this module
 logger = get_logger(__name__)
@@ -43,11 +43,18 @@ async def startup_event():
     """Initialize the orchestrator on startup."""
     global orchestrator
     try:
-        orchestrator = create_orchestrator(MODEL_NAME)
+        config = get_model_config()
+        logger.info(f"🚀 Initializing orchestrator with {config['provider'].upper()} provider")
+        logger.info(f"📝 Model: {config['model_name']}")
+        
+        orchestrator = create_orchestrator()
         logger.info("✅ AutoAnki orchestrator initialized successfully")
     except Exception as e:
         logger.error(f"❌ Failed to initialize orchestrator: {e}")
-        logger.error("Make sure Ollama is running and the model is available")
+        if MODEL_PROVIDER == "ollama":
+            logger.error("Make sure Ollama is running and the model is available")
+        elif MODEL_PROVIDER == "huggingface":
+            logger.error("Make sure your Hugging Face API key is valid and the model is accessible")
 
 @app.get("/")
 def read_root():
@@ -104,11 +111,22 @@ async def generate_flashcards(request: FlashcardRequest):
 
 @app.get("/models")
 def list_available_models():
-    """List available Ollama models (placeholder for future implementation)."""
+    """Get current model configuration."""
+    config = get_model_config()
     return {
-        "available_models": [MODEL_NAME, "mistral", "llama2"],
-        "current_model": MODEL_NAME,
-        "note": "This endpoint will be enhanced to actually check available models"
+        "current_provider": config["provider"],
+        "current_model": config["model_name"],
+        "provider_info": {
+            "ollama": {
+                "description": "Local Ollama instance",
+                "base_url": config.get("base_url") if config["provider"] == "ollama" else None
+            },
+            "huggingface": {
+                "description": "Hugging Face Inference API",
+                "has_api_key": bool(config.get("api_key")) if config["provider"] == "huggingface" else None
+            }
+        },
+        "note": f"Currently using {config['provider'].upper()} provider"
     }
 
 # TODO: Add MCP endpoints, Anki integration, agent endpoints

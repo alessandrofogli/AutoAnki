@@ -1,6 +1,6 @@
 from typing import Dict, Any
 from langchain_core.runnables import RunnableLambda
-from langchain_community.llms import Ollama
+from langchain_core.language_models.llms import LLM
 from langchain_core.prompts import PromptTemplate
 from config import get_logger
 
@@ -10,7 +10,7 @@ logger = get_logger(__name__)
 class TopicResearchAgent:
     """Agent that researches and creates a mini lesson on a given topic."""
     
-    def __init__(self, llm: Ollama):
+    def __init__(self, llm: LLM):
         self.llm = llm
         self.prompt = PromptTemplate(
             input_variables=["instruction"],
@@ -64,7 +64,7 @@ Mini Lesson:
         return result
 
 
-def create_topic_research_agent(llm: Ollama) -> RunnableLambda:
+def create_topic_research_agent(llm: LLM) -> RunnableLambda:
     """Factory function to create a runnable topic research agent."""
     agent = TopicResearchAgent(llm)
     return RunnableLambda(agent.run) 
